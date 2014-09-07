@@ -11,7 +11,26 @@
 |
 */
 
+/*
+|--------------------------------------------------------------------------
+| HOME ROUTES
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/', function()
 {
 	return View::make('hello');
+});
+
+/*
+|--------------------------------------------------------------------------
+| API ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::group(array('prefix' => 'api'), function() {
+    $rest_only = array('index', 'show', 'store', 'update','destroy');
+    Route::resource('user', 'UserController', array('only' => $rest_only));
+    Route::resource('board', 'BoardController', array('only' => $rest_only));
+    Route::resource('apply_record', 'ApplyRecordController', array('only' => $rest_only));
 });
