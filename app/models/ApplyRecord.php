@@ -21,4 +21,8 @@ class ApplyRecord extends Eloquent {
 
 	protected $fillable = array('board_id', 'user_id', 'event_name', 'event_type', 'post_from', 'post_end');
 
+	public function isApplicant($user_id) {
+		return $this->user_id == $user_id;
+	}
+
 }
