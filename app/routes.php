@@ -19,7 +19,7 @@
 
 Route::get('/', function()
 {
-	return View::make('hello');
+	return View::make('index');
 });
 
 /*
@@ -28,9 +28,11 @@ Route::get('/', function()
 |--------------------------------------------------------------------------
 */
 
-Route::post('auth', 'AuthController@login');
+Route::post('register', 'AuthController@register');
+Route::post('login', 'AuthController@login');
 Route::get('logout', 'AuthController@logout');
 Route::get('info', 'AuthController@info');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +42,10 @@ Route::get('info', 'AuthController@info');
 
 Route::group(array('prefix' => 'api'), function() {
     $rest_only = array('index', 'show', 'store', 'update','destroy');
-    Route::resource('user', 'UserController', array('only' => $rest_only));
-    Route::resource('board', 'BoardController', array('only' => $rest_only));
-    Route::resource('apply_record', 'ApplyRecordController', array('only' => $rest_only));
+    Route::resource('users', 'UserController', array('only' => $rest_only));
+    Route::resource('boards', 'BoardController', array('only' => $rest_only));
+    Route::resource('records', 'ApplyRecordController', array('only' => $rest_only));
+
+    Route::get('views/{name?}', 'ViewController@getView');
+    Route::get('maps/{name?}', 'ViewController@getMap');
 });
