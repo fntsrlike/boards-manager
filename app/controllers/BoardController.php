@@ -18,7 +18,14 @@ class BoardController extends \BaseController {
 	public function index()
 	{
 		$boards = Board::all();
-		return Response::json($boards);
+		$response = [];
+
+		foreach ($boards as $board) {
+			$isUsing = $board->isUsing( Input::get('from'), Input::get('end') );
+			$response[] = array_merge($board->toArray(), ['isUsing' => $isUsing ] );
+		}
+		
+		return Response::json($response);
 	}
 
 	/**
@@ -51,7 +58,10 @@ class BoardController extends \BaseController {
 	public function show($id)
 	{
 		$board = Board::find($id);
-		return Response::json($board);
+		$isUsing = $board->isUsing( Input::get('from'), Input::get('end') );
+		$response = array_merge($board->toArray(), ['isUsing' => $isUsing ] );
+
+		return Response::json($response);
 	}
 
 	/**
