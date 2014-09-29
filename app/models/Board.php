@@ -28,7 +28,12 @@ class Board extends Eloquent{
 		                                " ('$end'  between `post_from` AND `post_end`) OR " .
 		                                " (`post_from` <= '$from' AND `post_end` >= '$end'))")
 		                    ->first();
-		return !is_null($record);
+		return is_null($record) ? false : $record->id;
+	}
+
+	public function scopeCode($query, $code)
+	{
+		return $query->where('code', $code)->first();
 	}
 
 	public function scopeIsUsing($query, $from='', $end='')

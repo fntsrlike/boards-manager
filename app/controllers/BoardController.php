@@ -69,7 +69,7 @@ class BoardController extends \BaseController {
 	 */
 	public function show($id)
 	{
-		$board    = Board::find($id);
+		$board    = intval($id)>0 ? Board::find($id) : Board::code($id);
 		$isUsing  = $board->isUsing( Input::get('from'), Input::get('end') );
 		$response = array_merge($board->toArray(), ['isUsing' => $isUsing ] );
 
