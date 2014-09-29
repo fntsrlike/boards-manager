@@ -23,23 +23,39 @@ class BoardController extends \BaseController {
 	 */
 	public function index()
 	{
+		$boards = Board::orderBy('created_at', 'desc');
+
+		if ( Input::has('fields') ) {
+			$fields = explode(',', Input::get('fields'));
+			$boards = $boards->select($fields);
+		}
+
+		if ( Input::has('list') ) {
+			$list   = explode(',', Input::get('list'));
+			$boards = $boards->where(function($boards) use ($list) {
+				$boards->orWhereIn('id', $list)->orWhereIn('code', $list);
+			});
+		}
+
 		if ( Input::has('limit') ) {
 			$limit  = Input::get('limit');
 			$offset = Input::get('offset', 0);
-			$boards = Board::skip($offset)->take($limit )->orderBy('created_at', 'desc')->get();
+			$boards = $boards->skip($offset)->take($limit )->get();
 		}
 		else {
-			$boards = Board::orderBy('created_at', 'desc')->get();
+			$boards = $boards->get();
 		}
 
-		$response = [];
-
-		foreach ($boards as $board) {
-			$isUsing = $board->isUsing( Input::get('from'), Input::get('end') );
-			$response[] = array_merge($board->toArray(), ['isUsing' => $isUsing ] );
+		if ( !Input::has('fields') or Input::has('fields') && in_array('using_status', $fields)) {
+			$response = [];
+			foreach ($boards as $board) {
+				$isUsing = $board->getUsingStatus( Input::get('from'), Input::get('end') );
+				$response[] = array_merge($board->toArray(), ['using_status' => $isUsing ] );
+			}
+			$boards = $response;
 		}
 
-		return Response::json($response);
+		return Response::json($boards);
 	}
 
 	/**
@@ -78,8 +94,8 @@ class BoardController extends \BaseController {
 	public function show($id)
 	{
 		$board    = intval($id)>0 ? Board::find($id) : Board::code($id);
-		$isUsing  = $board->isUsing( Input::get('from'), Input::get('end') );
-		$response = array_merge($board->toArray(), ['isUsing' => $isUsing ] );
+		$isUsing  = $board->getUsingStatus( Input::get('from'), Input::get('end') );
+		$response = array_merge($board->toArray(), ['using_status' => $isUsing ] );
 
 		return Response::json($response);
 	}

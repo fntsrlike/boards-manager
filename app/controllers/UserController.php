@@ -20,13 +20,27 @@ class UserController extends \BaseController {
 	 */
 	public function index()
 	{
+		$users = User::orderBy('created_at', 'desc');
+
+		if ( Input::has('fields') ) {
+			$fields = explode(',', Input::get('fields'));
+			$users  = $users->select($fields);
+		}
+
+		if ( Input::has('list') ) {
+			$list  = explode(',', Input::get('list'));
+			$users = $users->where(function($users) use ($list) {
+				$users->orWhereIn('id', $list)->orWhereIn('username', $list);
+			});
+		}
+
 		if ( Input::has('limit') ) {
 			$limit  = Input::get('limit');
 			$offset = Input::get('offset', 0);
-			$users  = User::skip($offset)->take($limit )->orderBy('created_at', 'desc')->get();
+			$users  = $users->skip($offset)->take($limit)->get();
 		}
 		else {
-			$users = User::orderBy('created_at', 'desc')->get();
+			$users = $users->get();
 		}
 
 		return Response::json($users);

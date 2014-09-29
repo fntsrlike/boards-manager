@@ -134,7 +134,7 @@ $( function(){
                 '<td>' + board.code + '</td>' +
                 '<td>' + board.type + '</td>' +
                 '<td>' + board.description + '</td>' +
-                '<td>' + board.isUsing + '</td>' +
+                '<td>' + board.using_status + '</td>' +
                 '<td>' + board.created_at + '</td>' +
                 '</tr>';
         }).join();
@@ -146,8 +146,8 @@ $( function(){
         response.map( function( board ) {
             var target = $( '#map-nchu a div[data-code="' + board.code + '"' );
 
-            target.toggleClass( 'full', board.isUsing );
-            target.toggleClass( 'empty', !board.isUsing );
+            target.toggleClass( 'full', board.using_status );
+            target.toggleClass( 'empty', !board.using_status );
         });
         events.map_units();
     }
@@ -158,8 +158,8 @@ $( function(){
             if ( code !== undefined ) {
                 console.log(code);
                 models.get( api.boards + '/' + code, function( board ){
-                    if ( board.isUsing > 0 ) {
-                        models.get( api.apply + '/' + board.isUsing, function( record ){
+                    if ( board.using_status > 0 ) {
+                        models.get( api.apply + '/' + board.using_status, function( record ){
                             models.get( api.users + '/' + record.user_id, function( user ){
                                 events.boardPop(board, record, user);
                             });
