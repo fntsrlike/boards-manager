@@ -1,8 +1,8 @@
 var host        = 'http://localhost:9527',
     models      = {},
-    views       = {};
+    views       = {},
     controllers = {},
-    events      = {}, 
+    events      = {},
     api         = {};
 
 api = {
@@ -27,6 +27,10 @@ $( function(){
             target.replaceWith( data );
         }, 'html');
     };
+
+    views.getPopverTemp = function() {
+        return '<div class="popover" style="min-width:300px;" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>';
+    }
 
     views.updateNavigation = function() {
         views.updateView( $( '#navigation' ), 'navigation');
@@ -65,7 +69,7 @@ $( function(){
     }
 
     models.login = function( callback ) {
-        models.post( api.login, "#modal_login form", callback );        
+        models.post( api.login, "#modal_login form", callback );
     };
 
     models.register = function( callback ) {
@@ -73,7 +77,7 @@ $( function(){
     };
 
     models.apply = function( callback ) {
-        models.post( api.apply, "#tab_apply form", callback );    
+        models.post( api.apply, "#tab_apply form", callback );
     };
 
     models.records = function( callback ) {
@@ -111,13 +115,13 @@ $( function(){
     events.records = function( response ) {
         var records = response.map( function( record ) {
             return '<tr>' +
-                '<td>' + record.id + '</td>' + 
-                '<td>' + record.user_id + '</td>' + 
-                '<td>' + record.event_name + '</td>' + 
-                '<td>' + record.event_type + '</td>' + 
-                '<td>' + record.board_id + '</td>' + 
-                '<td>' + record.post_from + ' to ' + record.post_end + '</td>' + 
-                '<td>' + record.created_at + '</td>' + 
+                '<td>' + record.id + '</td>' +
+                '<td>' + record.user_id + '</td>' +
+                '<td>' + record.event_name + '</td>' +
+                '<td>' + record.event_type + '</td>' +
+                '<td>' + record.board_id + '</td>' +
+                '<td>' + record.post_from + ' to ' + record.post_end + '</td>' +
+                '<td>' + record.created_at + '</td>' +
                 '</tr>';
         }).join();
 
@@ -127,21 +131,77 @@ $( function(){
     events.boards = function( response ) {
         var boards = response.map( function( board ) {
             return '<tr>' +
-                '<td>' + board.code + '</td>' + 
-                '<td>' + board.type + '</td>' + 
-                '<td>' + board.description + '</td>' + 
-                '<td>' + board.isUsing + '</td>' + 
-                '<td>' + board.created_at + '</td>' + 
+                '<td>' + board.code + '</td>' +
+                '<td>' + board.type + '</td>' +
+                '<td>' + board.description + '</td>' +
+                '<td>' + board.isUsing + '</td>' +
+                '<td>' + board.created_at + '</td>' +
                 '</tr>';
         }).join();
 
         $( '#tab_list table tr:last' ).after( boards );
     }
 
+    events.map = function( response ) {
+        response.map( function( board ) {
+            var target = $( '#map-nchu a div[data-code="' + board.code + '"' );
+
+            target.toggleClass( 'full', board.isUsing );
+            target.toggleClass( 'empty', !board.isUsing );
+        });
+        events.map_units();
+    }
+
+    events.map_units = function() {
+        $( "#tab_map a").map( function( key, unit ) {
+            var code = $("div.full", unit).attr('data-code');
+            if ( code !== undefined ) {
+                console.log(code);
+                models.get( api.boards + '/' + code, function( board ){
+                    if ( board.isUsing > 0 ) {
+                        models.get( api.apply + '/' + board.isUsing, function( record ){
+                            models.get( api.users + '/' + record.user_id, function( user ){
+                                events.boardPop(board, record, user);
+                            });
+                        });
+                    }
+                });
+
+            }
+
+        });
+    }
+
+    events.boardPop = function(board, record, user) {
+        var
+        options = {},
+        content = '',
+        target  = $('#tab_map a div[data-code="' + board.code + '"]');
+
+        if ( target.attr('aria-describedby') == undefined ) {
+            content = '' +
+                'User: ' + user.title + ' (' + user.username + ')<br/>' +
+                'Type: ' + record.event_type + '<br/>' +
+                'Date: [ ' + record.post_from + ' ] - [ ' + record.post_end  + ' ]';
+
+            options = {
+                trigger: 'hover',
+                placement: 'top',
+                html: true,
+                title: record.event_name,
+                content: content,
+                template: views.getPopverTemp()
+            };
+
+            target.popover(options);
+        };
+    }
+
     events.init = function() {
         controllers.listener();
         models.records(events.records);
         models.boards(events.boards);
+        models.boards(events.map);
     }
 
     controllers.listener = function() {

@@ -67,31 +67,31 @@
 
 <div id="map-nchu">
   <div id="map-nchu-large-wx">
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
+    <a href="#" ><div class="unit empty" data-code="W"></div></a>
+    <a href="#" ><div class="unit empty" data-code="X"></div></a>
   </div>
 
   <div id="map-nchu-stairs">
-    <a href="#"><div class="unit empty"></div></a>
+    <a href="#" ><div class="unit empty" data-code="S"></div></a>
   </div>
 
   <div id="map-nchu-large-yz">
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
+    <a href="#" ><div class="unit empty" data-code="Y"></div></a>
+    <a href="#" ><div class="unit empty" data-code="Z"></div></a>
   </div>
 
   <div id="map-nchu-normal">
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
-    <a href="#"><div class="unit empty"></div></a>
+    <a href="#" ><div class="unit empty" data-code="A"></div></a>
+    <a href="#" ><div class="unit empty" data-code="B"></div></a>
+    <a href="#" ><div class="unit empty" data-code="C"></div></a>
+    <a href="#" ><div class="unit empty" data-code="D"></div></a>
+    <a href="#" ><div class="unit empty" data-code="E"></div></a>
+    <a href="#" ><div class="unit empty" data-code="F" data-trigger="focus"></div></a>
+    <a href="#" ><div class="unit empty" data-code="G"></div></a>
+    <a href="#" ><div class="unit empty" data-code="H"></div></a>
+    <a href="#" ><div class="unit empty" data-code="I"></div></a>
+    <a href="#" ><div class="unit empty" data-code="J"></div></a>
+    <a href="#" ><div class="unit empty" data-code="K"></div></a>
+    <a href="#" ><div class="unit empty" data-code="L"></div></a>
   </div>
 </div>
