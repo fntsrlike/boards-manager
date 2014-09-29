@@ -24,13 +24,53 @@ class ApplyRecordController extends \BaseController {
 	 */
 	public function index()
 	{
+		$records = ApplyRecord::orderBy('created_at', 'desc');
+
+		if ( Input::has('fields') ) {
+			$fields  = explode(',', Input::get('fields'));
+			$records = $records->select($fields);
+		}
+
+		if ( Input::has('list') ) {
+			$list    = explode(',', Input::get('list'));
+			$records = $records->whereIn('id', $list);
+		}
+
+		if ( Input::has('user_list') ) {
+			$list    = explode(',', Input::get('user_list'));
+			$records = $records->whereIn('user_id', $list);
+		}
+
+		if ( Input::has('board_list') ) {
+			$list    = explode(',', Input::get('board_list'));
+			$records = $records->whereIn('board_id', $list);
+		}
+
+		if ( Input::has('type_list') ) {
+			$list    = explode(',', Input::get('type_list'));
+			var_dump($list);
+			$records = $records->whereIn('event_type', $list);
+		}
+
+		if ( Input::has('date_list') ) {
+			$list    = explode(',', Input::get('date_list'));
+			$records = $records->where(function($records) use ($list) {
+				foreach ($list as $date) {
+					if ( strtotime($date) ) {
+						$date = date('Y-m-d', strtotime($date));
+						$records = $records->orWhereRaw("('$date' between `post_from` AND `post_end`)");
+					}
+				}
+			});
+		}
+
 		if ( Input::has('limit') ) {
 			$limit   = Input::get('limit');
 			$offset  = Input::get('offset', 0);
-			$records = ApplyRecord::skip($offset)->take($limit )->orderBy('created_at', 'desc')->get();
+			$records = $records->skip($offset)->take($limit )->get();
 		}
 		else {
-			$records = ApplyRecord::orderBy('created_at', 'desc')->get();
+			$records = $records->get();
 		}
 
 		return Response::json($records);
@@ -68,7 +108,7 @@ class ApplyRecordController extends \BaseController {
 		$end   = Input::get('end');
 		$days_diff = round((strtotime($end) - strtotime($from))/60/60/24);
 
-		if ( $board->isUsing( $from, $end ) ) {
+		if ( $board->getUsingStatus( $from, $end ) ) {
 			return Response::json(['success' => false]);
 		}
 

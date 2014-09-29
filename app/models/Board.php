@@ -18,16 +18,20 @@ class Board extends Eloquent{
 
 	protected $fillable = array('type', 'code', 'description');
 
-	public function isUsing($from='', $end='')
+	public function getUsingStatus($from='', $end='')
 	{
 		if ( empty($from) or empty($end) ) {
 			$from = $end = date("Y-m-d") ;
 		}
-		$record = ApplyRecord::where('board_id', '=', $this->id)
-		                    ->whereRaw( "(('$from' between `post_from` AND `post_end`) OR " .
-		                                " ('$end'  between `post_from` AND `post_end`) OR " .
-		                                " (`post_from` <= '$from' AND `post_end` >= '$end'))")
-		                    ->first();
+
+		$record = ApplyRecord::where(function($record) use ($from, $end) {
+			$record->orWhereRaw("'$from' between `post_from` AND `post_end`")
+					->orWhereRaw("'$end'  between `post_from` AND `post_end`")
+					->orWhereRaw("`post_from` <= '$from' AND `post_end` >= '$end'");
+		})
+		->where('board_id', '=', $this->id)
+		->first();
+
 		return is_null($record) ? false : $record->id;
 	}
 
@@ -42,9 +46,12 @@ class Board extends Eloquent{
 			$from = $end = date("Y-m-d") ;
 		}
 
-		$records = ApplyRecord::whereRaw("(('$from' between `post_from` AND `post_end`) OR " .
-		                                 " ('$end'  between `post_from` AND `post_end`) OR " .
-		                                 " (`post_from` <= '$from' AND `post_end` >= '$end'))");
+		$records = ApplyRecord::where(function($records) use ($from, $end) {
+			$records->orWhereRaw("'$from' between `post_from` AND `post_end`")
+					->orWhereRaw("'$end'  between `post_from` AND `post_end`")
+					->orWhereRaw("`post_from` <= '$from' AND `post_end` >= '$end'");
+		});
+
 		$using_boards = array_unique($records->lists('board_id'));
 
 		return $query->whereIn('id', $using_boards);
@@ -57,9 +64,12 @@ class Board extends Eloquent{
 			$from = $end = date("Y-m-d");
 		}
 
-		$records = ApplyRecord::whereRaw("(('$from' between `post_from` AND `post_end`) OR " .
-		                                 " ('$end'  between `post_from` AND `post_end`) OR " .
-		                                 " (`post_from` <= '$from' AND `post_end` >= '$end'))");
+		$records = ApplyRecord::where(function($records) use ($from, $end) {
+			$records->orWhereRaw("'$from' between `post_from` AND `post_end`")
+					->orWhereRaw("'$end'  between `post_from` AND `post_end`")
+					->orWhereRaw("`post_from` <= '$from' AND `post_end` >= '$end'");
+		});
+
 		$using_boards = array_unique($records->lists('board_id'));
 
 		return $query->whereNotIn('id', $using_boards);
