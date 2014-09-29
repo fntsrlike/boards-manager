@@ -24,9 +24,15 @@ class ApplyRecordController extends \BaseController {
 	 */
 	public function index()
 	{
-		// TODO: Dynamic Loading by query string
+		if ( Input::has('limit') ) {
+			$limit   = Input::get('limit');
+			$offset  = Input::get('offset', 0);
+			$records = ApplyRecord::skip($offset)->take($limit )->orderBy('created_at', 'desc')->get();
+		}
+		else {
+			$records = ApplyRecord::orderBy('created_at', 'desc')->get();
+		}
 
-		$records = ApplyRecord::all();
 		return Response::json($records);
 	}
 

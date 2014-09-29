@@ -23,7 +23,15 @@ class BoardController extends \BaseController {
 	 */
 	public function index()
 	{
-		$boards = Board::all();
+		if ( Input::has('limit') ) {
+			$limit  = Input::get('limit');
+			$offset = Input::get('offset', 0);
+			$boards = Board::skip($offset)->take($limit )->orderBy('created_at', 'desc')->get();
+		}
+		else {
+			$boards = Board::orderBy('created_at', 'desc')->get();
+		}
+
 		$response = [];
 
 		foreach ($boards as $board) {
