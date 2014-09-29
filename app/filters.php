@@ -88,3 +88,50 @@ Route::filter('csrf', function()
 		throw new Illuminate\Session\TokenMismatchException;
 	}
 });
+
+Route::filter('perm_boards_manage', function()
+{
+	if ( !Auth::user()->can('boards_management') ){
+		return Response::json(['success' => false, 'errors' => 'Permission Deny']);
+	}
+});
+
+Route::filter('perm_user_manage', function()
+{
+	if ( !Auth::user()->can('users_management') ){
+		return Response::json(['success' => false, 'errors' => 'Permission Deny']);
+	}
+});
+
+
+Route::filter('perm_apply', function()
+{
+	if ( !( Auth::user()->ability([], ['apply_records_management', 'apply_post']) ) ){
+		return Response::json(['success' => false, 'errors' => 'Permission Deny']);
+	}
+});
+
+Route::filter('perm_apply_owner', function()
+{
+	$record_id = Request::segment(3);
+	$record    = ApplyRecord::find($record_id);
+	$user_id   = $record->user_id;
+
+	if ( !Auth::user()->can('apply_records_management') ) {
+		if ( $user_id !== Auth::id() ) {
+			return Response::json(['success' => false, 'errors' => 'Permission Deny']);
+		}
+	}
+});
+
+Route::filter('input_date', function()
+{
+	$validator = Validator::make( Input::all(), [
+		'from' => 'date_format:Y-m-d',
+		'end'  => 'date_format:Y-m-d',
+	]);
+
+	if ($validator->fails()) {
+		return Response::json(['success' => false, 'errors' => $validator->errors()]);
+	}
+});

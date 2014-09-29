@@ -7,7 +7,14 @@ class ApplyRecordController extends \BaseController {
 	*/
 	public function __construct()
 	{
-		$this->beforeFilter('auth', ['only' => ['store', 'update', 'destroy']]);
+		$CUD = array('only' => ['store', 'update', 'destroy']);
+		$UD  = array('only' => ['update', 'destroy']);
+		$R   = array('only' => ['index','show']);
+
+		$this->beforeFilter('auth', $CUD);
+		$this->beforeFilter('perm_apply', $CUD);
+		$this->beforeFilter('perm_apply_owner', $UD);
+		$this->beforeFilter('input_date', $R);
 	}
 
 	/**
@@ -30,25 +37,56 @@ class ApplyRecordController extends \BaseController {
 	 */
 	public function store()
 	{
-		if ( !( Auth::user()->ability([], ['apply_records_management', 'apply_post']) ) ){
-			throw new Exception("Permission Deny", 1);
+		# Config
+		$config       = Config::get('poster');
+		$post_types   = $config['post_types'];
+		$event_types  = $config['event_types'];
+		$days         = $config['days'];
+
+		# Form Validation
+		$rules = array(
+			'code'     => 'required|exists:boards,code',
+			'program'  => 'required|between:3,32',
+			'type'     => 'required|in:' . implode(',', $event_types),
+			'from'     => 'required|date_format:Y-m-d',
+			'end'      => 'required|date_format:Y-m-d',
+		);
+
+		if ( Validator::make($rules)->fails() ) {
+			return Response::json(['success' => false, 'errors' => $validator->errors()]);
 		}
 
-		// TODO: Form Validation
-		// TODO: Poster Validation (ex. date can't repeat)
+		# Poster Status Validation
+		$board = Board::where('code', Input::get('code'))->first();
+		$from  = Input::get('from');
+		$end   = Input::get('end');
+		$days_diff = round((strtotime($end) - strtotime($from))/60/60/24);
 
-		ApplyRecord::create(array(
-			'board_id' 		=> Input::get('board_id'),
-			'user_id' 		=> Auth::id(),
-			'event_name' 	=> Input::get('event_name'),
-			'event_type'	=> Input::get('event_type'),
-			'post_from' 	=> Input::get('post_from'),
-			'post_end' 		=> Input::get('post_end'),
-		));
+		if ( $board->isUsing( $from, $end ) ) {
+			return Response::json(['success' => false]);
+		}
 
-		return Response::json(array('success' => true));
+		# Days Validation
+		if ( $board->type == 'large' and $days_diff >  $days['large_poster'] ) {
+			return Response::json(['success' => false]);
+		}
+
+		if ( $days_diff > $days[Input::get('type')] ) {
+			return Response::json(['success' => false]);
+		}
+
+		# Create
+		ApplyRecord::create([
+			'board_id'      => $board->id,
+			'user_id'       => Auth::id(),
+			'event_name'    => Input::get('program'),
+			'event_type'    => Input::get('type'),
+			'post_from'     => $from,
+			'post_end'      => $end,
+		]);
+
+		return Response::json(['success' => true]);
 	}
-
 
 	/**
 	 * Display the specified resource.
@@ -70,38 +108,21 @@ class ApplyRecordController extends \BaseController {
 	 */
 	public function update($id)
 	{
-
-		if ( !Auth::user()->can('apply_records_management')) {
-			if ( !(Auth::user()->can('apply_post') AND (Board::find($id)->user_id !== Auth::id()) ) ){
-				throw new Exception("Permission Deny", 1);
-			}
-		}
-
-		// TODO: Form Validation
-		// TODO: Poster Validation (ex. date can't repeat)
-
-		$update_info = array(
-			'event_name' 	=> Input::get('event_name'),
-			'event_type'	=> Input::get('event_type'),
+		# Form Validaiton
+		$rules = array(
+			'program'  => 'required|between:3,32',
 		);
 
-		if ( Auth::user()->can('apply_records_management') ) {
-			$update_info = array_merge($update_info, [
-				'board_id' 		=> Input::get('board_id'),
-				'user_id' 		=> Input::get('user_id'),
-				'post_from' 	=> Input::get('post_from'),
-				'post_end' 		=> Input::get('post_end'),
-			]);
+		if ( Validator::make($rules)->fails() ) {
+			return Response::json(['success' => false, 'errors' => $validator->errors()]);
 		}
 
-		// Clear empty elements
-		$update_info = array_diff($update_info, ['']);
+		# Update
+		$update = ['event_name' => Input::get('program')];
+		ApplyRecord::find($id)->update($update);
 
-		ApplyRecord::find($id)->update($update_info);
-
-		return Response::json(array('success' => true));
+		return Response::json(['success' => true]);
 	}
-
 
 	/**
 	 * Remove the specified resource from storage.
@@ -111,14 +132,8 @@ class ApplyRecordController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		if ( !Auth::user()->can('apply_records_management')) {
-			if ( !( Auth::user()->can('apply_post') AND ApplyRecord::find($id)->isApplicant(Auth::id()) ) ){
-				throw new Exception("Permission Deny", 1);
-			}
-		}
-
 		ApplyRecord::destroy($id);
-		return Response::json(array('success' => true));
+		return Response::json(['success' => true]);
 	}
 
 
