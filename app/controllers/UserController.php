@@ -20,7 +20,15 @@ class UserController extends \BaseController {
 	 */
 	public function index()
 	{
-		$users = User::all();
+		if ( Input::has('limit') ) {
+			$limit  = Input::get('limit');
+			$offset = Input::get('offset', 0);
+			$users  = User::skip($offset)->take($limit )->orderBy('created_at', 'desc')->get();
+		}
+		else {
+			$users = User::orderBy('created_at', 'desc')->get();
+		}
+
 		return Response::json($users);
 	}
 
