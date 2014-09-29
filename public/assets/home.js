@@ -153,22 +153,40 @@ $( function(){
     }
 
     events.map_units = function() {
-        $( "#tab_map a").map( function( key, unit ) {
-            var code = $("div.full", unit).attr('data-code');
+        var
+        code_list   = '',
+        record_list = '',
+        user_list   = '';
+
+        $( "#tab_map a div.full").each( function() {
+            var code = $(this).attr('data-code');
             if ( code !== undefined ) {
-                console.log(code);
-                models.get( api.boards + '/' + code, function( board ){
-                    if ( board.using_status > 0 ) {
-                        models.get( api.apply + '/' + board.using_status, function( record ){
-                            models.get( api.users + '/' + record.user_id, function( user ){
-                                events.boardPop(board, record, user);
-                            });
-                        });
-                    }
+                code_list = code_list + code + ',';
+            }
+        });
+        console.log(code_list);
+
+        models.get( api.boards + '?list=' + code_list, function( boards ){
+
+            boards.map( function( board ) {
+                record_list += board.using_status + ',';
+            });
+
+            models.get( api.apply + '?list=' + record_list, function( records ){
+                records.map( function( record ) {
+                    user_list += record.user_id + ',';
                 });
 
-            }
-
+                models.get( api.users + '?list=' + user_list, function( users ){
+                    records.map( function( record, key ) {
+                        users.map( function( user ) {
+                            if ( record.user_id == user.id ) {
+                                events.boardPop(boards[key], records[key], user);
+                            }
+                        });
+                    });
+                });
+            });
         });
     }
 
