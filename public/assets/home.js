@@ -8,7 +8,8 @@ var host        = 'http://localhost:9527',
 api = {
     views    : host + '/api/views',
     users    : host + '/api/users',
-    apply   : host + '/api/records',
+    apply    : host + '/api/records',
+    boards   : host + '/api/boards',
     register : host + '/register',
     login    : host + '/login'
 };
@@ -57,6 +58,12 @@ $( function(){
         });
     }
 
+    models.get = function( url, callback ) {
+        $.get( url ).done( function( data ) {
+            callback(data);
+        });
+    }
+
     models.login = function( callback ) {
         models.post( api.login, "#modal_login form", callback );        
     };
@@ -67,6 +74,14 @@ $( function(){
 
     models.apply = function( callback ) {
         models.post( api.apply, "#tab_apply form", callback );    
+    };
+
+    models.records = function( callback ) {
+        models.get( api.apply, callback );
+    };
+
+    models.boards = function( callback ) {
+        models.get( api.boards, callback );
     };
 
     events.register = function( response ) {
@@ -93,6 +108,42 @@ $( function(){
         }
     };
 
+    events.records = function( response ) {
+        var records = response.map( function( record ) {
+            return '<tr>' +
+                '<td>' + record.id + '</td>' + 
+                '<td>' + record.user_id + '</td>' + 
+                '<td>' + record.event_name + '</td>' + 
+                '<td>' + record.event_type + '</td>' + 
+                '<td>' + record.board_id + '</td>' + 
+                '<td>' + record.post_from + ' to ' + record.post_end + '</td>' + 
+                '<td>' + record.created_at + '</td>' + 
+                '</tr>';
+        }).join();
+
+        $( '#tab_records table tr:last' ).after( records );
+    }
+
+    events.boards = function( response ) {
+        var boards = response.map( function( board ) {
+            return '<tr>' +
+                '<td>' + board.code + '</td>' + 
+                '<td>' + board.type + '</td>' + 
+                '<td>' + board.description + '</td>' + 
+                '<td>' + board.isUsing + '</td>' + 
+                '<td>' + board.created_at + '</td>' + 
+                '</tr>';
+        }).join();
+
+        $( '#tab_list table tr:last' ).after( boards );
+    }
+
+    events.init = function() {
+        controllers.listener();
+        models.records(events.records);
+        models.boards(events.boards);
+    }
+
     controllers.listener = function() {
         $( "#modal_register form" ).submit( function( event ){
             event.preventDefault();
@@ -108,6 +159,8 @@ $( function(){
             event.preventDefault();
             models.apply( events.apply );
         });
-    }();
+    };
+
+    events.init();
 
 });
