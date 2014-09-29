@@ -7,7 +7,10 @@ class UserController extends \BaseController {
 	*/
 	public function __construct()
 	{
-		$this->beforeFilter('auth', ['only' => ['store', 'update', 'destroy']]);
+		$CUD = array('only' => ['store', 'update', 'destroy']);
+
+		$this->beforeFilter('auth', $CUD);
+		$this->beforeFilter('perm_user_manage', $CUD);
 	}
 
 	/**
@@ -28,22 +31,33 @@ class UserController extends \BaseController {
 	 */
 	public function store()
 	{
-		if ( !Auth::user()->can('users_management') ){
-			throw new Exception("Permission Deny", 1);
+		# Config
+		$roles = array_keys(Config::get('role_perm.roles'));
+
+		$validator = Validator::make(Input::all(), [
+			'username'  => 'required|between:3,24|unique:users,username',
+			'password'  => 'required|between:8,32',
+			'password2' => 'required|same:password',
+			'roles'     => 'required|in:' . implode(',', $roles),
+			'title'     => 'required|between:3,24',
+			'email'     => 'required|email|unique:users,email',
+			'phone'     => 'required|min:5|unique:users,phone',
+		]);
+
+		if ($validator->fails()) {
+			return Response::json(['success' => false]);
 		}
 
-		// TODO: Form Validation
+		$user = User::create([
+			'username'   => Input::get('username'),
+			'password'   => Input::get('password'),
+			'title'      => Input::get('title'),
+			'roles'      => Input::get('roles'),
+			'email'      => Input::get('email'),
+			'phone'      => Input::get('phone'),
+		]);
 
-		User::create(array(
-			'username' 		=> Input::get('username'),
-			'password' 		=> Input::get('password'),
-			'title' 		=> Input::get('title'),
-			'roles' 		=> Input::get('roles'),
-			'email' 		=> Input::get('email'),
-			'phone' 		=> Input::get('phone'),
-		));
-
-		return Response::json(array('success' => true));
+		return Response::json(['success' => true]);
 	}
 
 	/**
@@ -56,7 +70,7 @@ class UserController extends \BaseController {
 	{
 		$user = User::find($id);
 		return Response::json($user);
-    }
+	}
 
 	/**
 	 * Update the specified resource in storage.
@@ -66,34 +80,36 @@ class UserController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		if ( !( Auth::user()->can('users_management') OR ($id !== Auth::id()) ) ){
-			throw new Exception("Permission Deny", 1);
+		# Config
+		$roles = array_keys(Config::get('role_perm.roles'));
+
+		$validator = Validator::make(Input::all(), [
+			'username'  => 'sometimes|between:3,24|unique:users,username',
+			'password'  => 'sometimes|between:8,32',
+			'password2' => 'sometimes|same:password',
+			'roles'     => 'sometimes|in:' . implode(',', $roles),
+			'title'     => 'sometimes|between:3,24',
+			'email'     => 'sometimes|email|unique:users,email',
+			'phone'     => 'sometimes|min:5|unique:users,phone',
+		]);
+
+		if ($validator->fails()) {
+			return Response::json(['success' => false]);
 		}
 
-		// TODO: Form Validation
-
-		$update_info = array(
-			'password' 		=> Input::get('password'),
-			'title' 		=> Input::get('title'),
-			'email' 		=> Input::get('email'),
-			'phone' 		=> Input::get('phone'),
-		);
-
-		if ( Auth::user()->can('users_management') ) {
-			$update_info = array_merge($update_info, [
-				'username' 		=> Input::get('username'),
-				'phone' 		=> Input::get('phone'),
-			]);
-		}
-
-		// Clear empty elements
-		$update_info = array_diff($update_info, ['']);
+		$update_info = array_diff([
+			'username'   => Input::get('username'),
+			'password'   => Input::get('password'),
+			'roles'      => Input::get('roles'),
+			'title'      => Input::get('title'),
+			'email'      => Input::get('email'),
+			'phone'      => Input::get('phone'),
+		], ['']);
 
 		User::find($id)->update($update_info);
 
-		return Response::json(array('success' => true));
+		return Response::json(['success' => true]);
 	}
-
 
 	/**
 	 * Remove the specified resource from storage.
@@ -103,12 +119,8 @@ class UserController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		if ( !( Auth::user()->can('users_management') OR ($id !== Auth::id()) ) ){
-			throw new Exception("Permission Deny", 1);
-		}
-
 		$user = User::destroy($id);
-        return Response::json(array('success' => true));
+		return Response::json(['success' => true]);
 	}
 
 }

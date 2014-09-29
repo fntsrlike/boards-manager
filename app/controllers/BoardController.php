@@ -7,7 +7,13 @@ class BoardController extends \BaseController {
 	*/
 	public function __construct()
 	{
-		$this->beforeFilter('auth', ['only' => ['store', 'update', 'destroy']]);
+		$R   = array('only' => ['index','show']);
+		$CU  = array('only' => ['store', 'update']);
+		$CUD = array('only' => ['store', 'update', 'destroy']);
+
+		$this->beforeFilter('auth', $CUD);
+		$this->beforeFilter('perm_boards_manage', $CUD);
+		$this->beforeFilter('input_date', $R);
 	}
 
 	/**
@@ -24,7 +30,7 @@ class BoardController extends \BaseController {
 			$isUsing = $board->isUsing( Input::get('from'), Input::get('end') );
 			$response[] = array_merge($board->toArray(), ['isUsing' => $isUsing ] );
 		}
-		
+
 		return Response::json($response);
 	}
 
@@ -35,19 +41,25 @@ class BoardController extends \BaseController {
 	 */
 	public function store()
 	{
-		if ( !Auth::user()->can('boards_management') ){
-			throw new Exception("Permission Deny", 1);
+		$types = Config::get('poster.board_types');
+
+		$rules = array(
+			'code' => 'required|alpha_dash',
+			'type' => 'required|in:' . implode(',', $types),
+		);
+
+		if ( Validator::make($rules)->fails() ) {
+			return Response::json(['success' => false, 'errors' => $validator->errors()]);
 		}
 
-		Board::create(array(
+		Board::create([
 			'type' => Input::get('type'),
 			'code' => Input::get('code'),
 			'description' => Input::get('description'),
-		));
+		]);
 
-		return Response::json(array('success' => true));
+		return Response::json(['success' => true]);
 	}
-
 
 	/**
 	 * Display the specified resource.
@@ -57,8 +69,8 @@ class BoardController extends \BaseController {
 	 */
 	public function show($id)
 	{
-		$board = Board::find($id);
-		$isUsing = $board->isUsing( Input::get('from'), Input::get('end') );
+		$board    = Board::find($id);
+		$isUsing  = $board->isUsing( Input::get('from'), Input::get('end') );
 		$response = array_merge($board->toArray(), ['isUsing' => $isUsing ] );
 
 		return Response::json($response);
@@ -72,22 +84,12 @@ class BoardController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		if ( !Auth::user()->can('boards_management') ){
-			throw new Exception("Permission Deny", 1);
-		}
-
-		$board = Board::find($id)->update(array(
-			'type' => Input::get('type'),
-			'code' => Input::get('code'),
+		$board = Board::find($id)->update([
 			'description' => Input::get('description'),
-		));
+		]);
 
-		// Clear empty elements
-		$update_info = array_diff($update_info, ['']);
-
-		return Response::json(array('success' => true));
+		return Response::json(['success' => true]);
 	}
-
 
 	/**
 	 * Remove the specified resource from storage.
@@ -97,13 +99,8 @@ class BoardController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		if ( !Auth::user()->can('boards_management') ){
-			throw new Exception("Permission Deny", 1);
-		}
-
 		Board::destroy($id);
-		return Response::json(array('success' => true));
+		return Response::json(['success' => true]);
 	}
-
 
 }
