@@ -48,8 +48,11 @@ class BoardController extends \BaseController {
 
 		if ( !Input::has('fields') or Input::has('fields') && in_array('using_status', $fields)) {
 			$response = [];
+			$from = Input::get('from', date('Y-m-d'));
+			$end  = Input::get('end', date('Y-m-d'));
+
 			foreach ($boards as $board) {
-				$isUsing = $board->getUsingStatus( Input::get('from'), Input::get('end') );
+				$isUsing = $board->getUsingStatus( $from, $end );
 				$response[] = array_merge($board->toArray(), ['using_status' => $isUsing ] );
 			}
 			$boards = $response;

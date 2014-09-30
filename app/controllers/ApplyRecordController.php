@@ -24,7 +24,7 @@ class ApplyRecordController extends \BaseController {
 	 */
 	public function index()
 	{
-		$records = ApplyRecord::orderBy('created_at', 'desc');
+		$records = ApplyRecord::orderBy('created_at', 'desc')->orderBy('id', 'desc');
 
 		if ( Input::has('fields') ) {
 			$fields  = explode(',', Input::get('fields'));
@@ -43,6 +43,19 @@ class ApplyRecordController extends \BaseController {
 
 		if ( Input::has('board_list') ) {
 			$list    = explode(',', Input::get('board_list'));
+
+			foreach ($list as $key => $value) {
+				if ( !is_numeric($value) ) {
+					$board = Board::where('code', $value)->first();
+					if ( $board != null) {
+						$list[$key] = $board->id;
+					}
+					else {
+						unset($list[$key]);
+					}
+				}
+			}
+
 			$records = $records->whereIn('board_id', $list);
 		}
 
@@ -50,6 +63,17 @@ class ApplyRecordController extends \BaseController {
 			$list    = explode(',', Input::get('type_list'));
 			var_dump($list);
 			$records = $records->whereIn('event_type', $list);
+		}
+
+		if ( Input::has('from') or Input::has('end') ) {
+			$from = Input::get('from', date('Y-m-d'));
+			$end  = Input::get('end', date('Y-m-d'));
+			$records = $records->where(function($records) use ($from, $end) {
+				$records
+				->orWhereRaw("('$from' between `post_from` AND `post_end`)")
+				->orWhereRaw("('$end'  between `post_from` AND `post_end`)")
+				->orWhereRaw("'$from' <= `post_from` AND `post_end` <= '$end'");
+			});
 		}
 
 		if ( Input::has('date_list') ) {
