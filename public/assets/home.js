@@ -125,7 +125,7 @@ $( function(){
                 '</tr>';
         }).join();
 
-        $( '#tab_records table tr:last' ).after( records );
+        $( '#tab_records table tbody' ).html( records );
     }
 
     events.boards = function( response ) {
@@ -139,7 +139,7 @@ $( function(){
                 '</tr>';
         }).join();
 
-        $( '#tab_list table tr:last' ).after( boards );
+        $( '#tab_list table tbody' ).html( boards );
     }
 
     events.map = function( response ) {
@@ -164,9 +164,12 @@ $( function(){
                 code_list = code_list + code + ',';
             }
         });
-        console.log(code_list);
 
-        models.get( api.boards + '?list=' + code_list, function( boards ){
+        from = $( '#map_date_form input[name="begin_date"]' ).val(),
+        end = $( '#map_date_form input[name="end_date"]' ).val(),
+        url = api.boards + '?list=' + code_list + '&from=' + from + '&end=' + end;
+
+        models.get( url, function( boards ){
 
             boards.map( function( board ) {
                 record_list += board.using_status + ',';
@@ -220,6 +223,7 @@ $( function(){
         models.records(events.records);
         models.boards(events.boards);
         models.boards(events.map);
+        $('*[data-toggle="tooltip"]').tooltip({delay: { "show": 300, "hide": 100 }});
     }
 
     controllers.listener = function() {
@@ -237,6 +241,56 @@ $( function(){
             event.preventDefault();
             models.apply( events.apply );
         });
+
+        $( "#tab_list form" ).submit( function( event ){
+            event.preventDefault();
+            var
+            from = $( 'input[name="begin_date"]' , this ).val(),
+            end = $( 'input[name="end_date"]' , this ).val(),
+            url = api.boards + '?from=' + from + '&end=' + end;
+            $( '#tab_list table tbody' ).html('');
+
+            models.get( url, events.boards );
+        });
+
+        $( '#map_date_form' ).submit( function( event ){
+            event.preventDefault();
+            var
+            from = $( 'input[name="begin_date"]' , this ).val(),
+            end = $( 'input[name="end_date"]' , this ).val(),
+            url = api.boards + '?from=' + from + '&end=' + end;
+
+            $( '#tab_map a div' ).popover( 'destroy' );
+            $( '#tab_map a div ').removeClass( "empty full" )
+            models.get( url, events.map );
+        })
+
+        $( '#records_form' ).submit( function( event ){
+            event.preventDefault();
+            console.log('click');
+            var
+            params = {};
+            from = $( 'input[name="begin_date"]' , this ).val(),
+            end  = $( 'input[name="end_date"]' , this ).val(),
+            code = $( 'select[name="code"]' , this ).val(),
+            url = api.apply;
+
+
+            if ( from != '' ){
+                params.from = from;
+            }
+            if ( end != '' ){
+                params.end = end;
+            }
+            if ( code != 'all' ) {
+                params.board_list = code
+            }
+            url += '?' + jQuery.param( params );
+            console.log(url);
+
+            $( '#tab_records table tbody' ).html('');
+            models.get( url, events.records );
+        })
     };
 
     events.init();

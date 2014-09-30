@@ -27,9 +27,10 @@ class Board extends Eloquent{
 		$record = ApplyRecord::where(function($record) use ($from, $end) {
 			$record->orWhereRaw("'$from' between `post_from` AND `post_end`")
 					->orWhereRaw("'$end'  between `post_from` AND `post_end`")
-					->orWhereRaw("`post_from` <= '$from' AND `post_end` >= '$end'");
+					->orWhereRaw("'$from' <= `post_from` AND `post_end` <= '$end'");
 		})
 		->where('board_id', '=', $this->id)
+		->orderBy('post_from', 'desc')
 		->first();
 
 		return is_null($record) ? false : $record->id;
@@ -49,7 +50,7 @@ class Board extends Eloquent{
 		$records = ApplyRecord::where(function($records) use ($from, $end) {
 			$records->orWhereRaw("'$from' between `post_from` AND `post_end`")
 					->orWhereRaw("'$end'  between `post_from` AND `post_end`")
-					->orWhereRaw("`post_from` <= '$from' AND `post_end` >= '$end'");
+					->orWhereRaw("'$from' <= `post_from` AND `post_end` <= '$end'");
 		});
 
 		$using_boards = array_unique($records->lists('board_id'));
@@ -67,7 +68,7 @@ class Board extends Eloquent{
 		$records = ApplyRecord::where(function($records) use ($from, $end) {
 			$records->orWhereRaw("'$from' between `post_from` AND `post_end`")
 					->orWhereRaw("'$end'  between `post_from` AND `post_end`")
-					->orWhereRaw("`post_from` <= '$from' AND `post_end` >= '$end'");
+					->orWhereRaw("'$from' <= `post_from` AND `post_end` <= '$end'");
 		});
 
 		$using_boards = array_unique($records->lists('board_id'));
