@@ -29,11 +29,10 @@
       <table class="table">
         <thead>
           <tr>
-            <td>Code</td>
-            <td>Type</td>
-            <td>Desciption</td>
-            <td>Status</td>
-            <td>Details</td>
+            <th data-sort="string">Code</th>
+            <th data-sort="string">Type</th>
+            <th data-sort="string">Desciption</th>
+            <th data-sort="string">Status</th>
           </tr>
         </thead>
         <tbody>

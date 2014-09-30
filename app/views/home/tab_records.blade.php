@@ -52,13 +52,14 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <td>No.</td>
-            <td>Applicant</td>
-            <td>Program</td>
-            <td>Type</td>
-            <td>Board</td>
-            <td>Post Date</td>
-            <td>Created At</td>
+            <th data-sort="int">No.</th>
+            <th data-sort="string">Applicant</th>
+            <th data-sort="string">Program</th>
+            <th data-sort="string">Type</th>
+            <th data-sort="string">Board</th>
+            <th data-sort="date">Post From</th>
+            <th data-sort="date">Post End</th>
+            <th data-sort="date">Created At</th>
           </tr>
         </thead>
         <tbody>
