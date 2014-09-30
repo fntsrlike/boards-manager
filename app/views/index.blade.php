@@ -21,6 +21,7 @@
   <!-- <link rel="stylesheet" href="http://bootswatch.com/paper/bootstrap.min.css"> -->
   <script src="./assets/jquery.min.js"></script>
   <script src="./assets/bootstrap.min.js"></script>
+  <script src="./assets/stupidtable.min.js"></script>
   <script src="./assets/home.js"></script>
 </head>
 <body>

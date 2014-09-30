@@ -114,13 +114,28 @@ $( function(){
 
     events.records = function( response ) {
         var records = response.map( function( record ) {
-            return '<tr>' +
+            var
+            t_today  = new Date().getTime(),
+            t_from   = new Date(record.post_from).getTime(),
+            t_end    = new Date(record.post_end).getTime(),
+            tr_class = '';
+
+            if ( t_end < t_today ) {
+                tr_class = 'text-muted';
+            } else if ( t_from < t_today ) {
+                tr_class = 'text-danger';
+            } else {
+                tr_class = 'text-primary';
+            }
+
+            return '<tr class="' + tr_class + '">' +
                 '<td>' + record.id + '</td>' +
                 '<td>' + record.user_title + ' (' + record.username + ')</td>' +
                 '<td>' + record.event_name + '</td>' +
                 '<td>' + record.event_type_name + '</td>' +
                 '<td>' + record.board_code + '</td>' +
-                '<td>' + record.post_from + ' -> ' + record.post_end + '</td>' +
+                '<td>' + record.post_from + '</td>' +
+                '<td>' + record.post_end + '</td>' +
                 '<td>' + record.created_at + '</td>' +
                 '</tr>';
         }).join();
@@ -130,12 +145,17 @@ $( function(){
 
     events.boards = function( response ) {
         var boards = response.map( function( board ) {
-            return '<tr>' +
+            var status, details, tr_class;
+
+            status = board.using_status ? 'Using (' + board.using_status + ')' : 'Empty';
+            details = board.using_status ? board.using_status : '';
+            tr_class = board.using_status ? 'text-danger' : 'text-primary';
+
+            return '<tr class="' + tr_class + '">' +
                 '<td>' + board.code + '</td>' +
                 '<td>' + board.type + '</td>' +
                 '<td>' + board.description + '</td>' +
-                '<td>' + board.using_status + '</td>' +
-                '<td>' + board.created_at + '</td>' +
+                '<td>' + status + '</td>' +
                 '</tr>';
         }).join();
 
@@ -231,13 +251,38 @@ $( function(){
         });
     }
 
+    events.tablesort = function() {
+        var table;
+
+        table = $( 'table' ).stupidtable({
+            "date" : function( a, b ){
+                var
+                a_date = new Date( a ).getTime(),
+                b_date = new Date( b ).getTime();
+
+                return a_date - b_date;
+            }
+        });
+
+        table.bind('aftertablesort', function (event, data) {
+            var th, arrow;
+
+            th = $(this).find("th");
+            th.find(".arrow").remove();
+            arrow = data.direction === "asc" ? "↑" : "↓";
+            th.eq(data.column).append('<span class="arrow">' + arrow +'</span>');
+        });
+    }
+
     events.init = function() {
         controllers.listener();
         models.records(events.records);
         models.boards(events.boards);
         models.boards(events.map);
-        $('*[data-toggle="tooltip"]').tooltip({delay: { "show": 300, "hide": 100 }});
         events.url();
+        events.tablesort();
+
+        $('*[data-toggle="tooltip"]').tooltip({delay: { "show": 300, "hide": 100 }});
     }
 
     controllers.listener = function() {
