@@ -1,7 +1,7 @@
 <?php
 
-retrun array(
-	'board2_types' => [
+return array(
+	'board_types' => [
 		'normal',
 		'stairs',
 		'large',
@@ -16,5 +16,12 @@ retrun array(
 		'internal' => 14,
 		'external' => 21,
 		'internclub' => 28,
+	],
+	'name_mapping' => [
+		'event_types' => [
+			'internal' => 'Internal',
+			'external' => 'External',
+			'union' => 'Union/Interclub',
+		],
 	],
 );

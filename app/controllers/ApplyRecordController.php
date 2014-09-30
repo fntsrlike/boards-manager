@@ -97,6 +97,17 @@ class ApplyRecordController extends \BaseController {
 			$records = $records->get();
 		}
 
+		foreach ($records as $key => $record) {
+			$board = Board::find($record['board_id']);
+			$user  = User::find($record['user_id']);
+			$type_mapping = Config::get('poster.name_mapping.event_types');
+
+			$record->event_type_name = $type_mapping[$record->event_type];
+			$record->board_code      = $board->code;
+			$record->username        = $user->username;
+			$record->user_title      = $user->title;
+		}
+
 		return Response::json($records);
 	}
 
