@@ -116,11 +116,11 @@ $( function(){
         var records = response.map( function( record ) {
             return '<tr>' +
                 '<td>' + record.id + '</td>' +
-                '<td>' + record.user_id + '</td>' +
+                '<td>' + record.user_title + ' (' + record.username + ')</td>' +
                 '<td>' + record.event_name + '</td>' +
-                '<td>' + record.event_type + '</td>' +
-                '<td>' + record.board_id + '</td>' +
-                '<td>' + record.post_from + ' to ' + record.post_end + '</td>' +
+                '<td>' + record.event_type_name + '</td>' +
+                '<td>' + record.board_code + '</td>' +
+                '<td>' + record.post_from + ' -> ' + record.post_end + '</td>' +
                 '<td>' + record.created_at + '</td>' +
                 '</tr>';
         }).join();
