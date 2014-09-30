@@ -17,7 +17,7 @@
         <li>
           <a href="#tab_about" role="tab" data-toggle="tab">About</a>
         </li>
-        <li>
+        <li class="active">
           <a href="#tab_map" role="tab" data-toggle="tab">Maps</a>
         </li>
         <li>
@@ -36,7 +36,7 @@
       <ul class="nav navbar-nav navbar-right">
         @if (Auth::check())
           <li>
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{Auth::user()->username}} <span class="caret"></span></a>            
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{Auth::user()->username}} <span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
               @if (Auth::user()->can('boards_management'))
               <li>
@@ -48,11 +48,11 @@
                   <a href="#tab_administrate" role="tab" data-toggle="tab">Administrate</a>
                 </li>
               @endif
-              <li>            
+              <li>
                 <a href="{{action('AuthController@logout');}}" >Logout</a>
               </li>
             </ul>
-          </li>          
+          </li>
         @else
           <li>
             <a href="#" data-toggle="modal" data-target="#modal_register">Register</a>

@@ -218,12 +218,26 @@ $( function(){
         };
     }
 
+    events.url = function() {
+        var hash = window.location.hash;
+        hash && $( 'ul.nav a[href="' + hash + '"]' ).tab( 'show' );
+        $( '.navbar-nav a' ).click( function ( event ) {
+            var scrollmem;
+
+            $( this ).tab( 'show' );
+            scrollmem = $( 'body' ).scrollTop();
+            window.location.hash = this.hash;
+            $( 'html,body' ).scrollTop( scrollmem );
+        });
+    }
+
     events.init = function() {
         controllers.listener();
         models.records(events.records);
         models.boards(events.boards);
         models.boards(events.map);
         $('*[data-toggle="tooltip"]').tooltip({delay: { "show": 300, "hide": 100 }});
+        events.url();
     }
 
     controllers.listener = function() {
