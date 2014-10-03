@@ -274,6 +274,17 @@ $( function(){
         });
     }
 
+
+    events.applyForm = function( args ) {
+        console.log( args );
+        var form = $( '#tab_apply form' );
+
+        $( 'select[name="code"]', form ).val( args.code );
+        $( 'input[name="from"]', form ).val( args.from );
+        $( 'input[name="end"]' , form ).val( args.end );
+
+    }
+
     events.init = function() {
         controllers.listener();
         models.records(events.records);
@@ -350,6 +361,29 @@ $( function(){
             $( '#tab_records table tbody' ).html('');
             models.get( url, events.records );
         })
+
+        $( '.unit' ).click( function( event ) {
+            event.preventDefault();
+            var args;
+
+            if ( $( this ).hasClass('empty') ) {
+                if ( 0 < $( 'ul.nav a[href="#tab_apply"]' ).length ) {
+                    events.applyForm( args = {
+                        code : $( this ).attr( 'data-code' ),
+                        from : $( '#map_date_form input[name="begin_date"]' ).val(),
+                        end  : $( '#map_date_form input[name="end_date"]' ).val()
+                    });
+                    $( 'ul.nav a[href="#tab_apply"]' ).tab( 'show' );
+                    window.location.hash = 'tab_apply';
+                }
+                else {
+                    alert( 'You should login before apply!');
+                }
+            }
+            else {
+                alert( 'This board is applied.');
+            }
+        });
     };
 
     events.init();
