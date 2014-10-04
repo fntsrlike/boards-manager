@@ -1,0 +1,26 @@
+{
+  "name": "board_management_system",
+  "version": "0.0.1",
+  "homepage": "https://github.com/fntsrlike/boards_manager",
+  "authors": [
+    "Fntsrlike <fntsrlike@gmail.com>"
+  ],
+  "main": "public/assets/main.js",
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery" : "*",
+    "bootstrap" : "*",
+    "sweetalert" : "*"
+  }
+}

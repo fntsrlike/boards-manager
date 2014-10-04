@@ -5,6 +5,8 @@ var host        = 'http://localhost:9527',
     events      = {},
     api         = {};
 
+window.alert = sweetAlert;
+
 api = {
     views    : host + '/api/views',
     users    : host + '/api/users',

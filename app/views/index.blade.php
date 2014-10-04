@@ -17,12 +17,15 @@
       margin-bottom: 2em;
     }
   </style>
-  <link rel="stylesheet" href="./assets/bootstrap.min.css">
-  <!-- <link rel="stylesheet" href="http://bootswatch.com/paper/bootstrap.min.css"> -->
-  <script src="./assets/jquery.min.js"></script>
-  <script src="./assets/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="./vendor/bootstrap/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="./vendor/sweetalert/lib/sweet-alert.css" />
+
+  <script src="./vendor/jquery/dist/jquery.min.js"></script>
+  <script src="./vendor/jquery/dist/jquery.min.map"></script>
+  <script src="./vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="./vendor/sweetalert/lib/sweet-alert.min.js"></script>
   <script src="./assets/stupidtable.min.js"></script>
-  <script src="./assets/home.js"></script>
+  <script src="./assets/main.js"></script>
 </head>
 <body>
   <div class="tab-content">
