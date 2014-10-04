@@ -28,15 +28,15 @@
   <script src="./assets/main.js"></script>
 </head>
 <body>
+  @include('home.nav')
   <div class="tab-content">
-    @include('home.nav')
     @include('home.tab_about')
     @include('home.tab_map')
     @include('home.tab_list')
     @include('home.tab_apply')
     @include('home.tab_records')
-    @include('home.modal_register')
-    @include('home.modal_login')
   </div>
+  @include('home.modal_register')
+  @include('home.modal_login')
 </body>
 </html>
