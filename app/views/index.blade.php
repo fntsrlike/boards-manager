@@ -25,6 +25,11 @@
   <script src="./vendor/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="./vendor/sweetalert/lib/sweet-alert.min.js"></script>
   <script src="./assets/stupidtable.min.js"></script>
+  <script src="./assets/config.js"></script>
+  <script src="./assets/i18n.js"></script>
+  <script src="./assets/models.js"></script>
+  <script src="./assets/views.js"></script>
+  <script src="./assets/events.js"></script>
   <script src="./assets/main.js"></script>
 </head>
 <body>
