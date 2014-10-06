@@ -25,4 +25,20 @@ class ApplyRecord extends Eloquent {
 		return $this->user_id == $user_id;
 	}
 
+	public function scopeDate($query, $from='', $end='')
+	{
+		if ( empty($from) or empty($end) ) {
+			$from = $end = date("Y-m-d") ;
+		}
+
+		$query->where(function($query) use ($from, $end) {
+			$query->orWhereRaw("'$from' between `post_from` AND `post_end`")
+				  ->orWhereRaw("'$end'  between `post_from` AND `post_end`")
+				  ->orWhereRaw("'$from' <= `post_from` AND `post_end` <= '$end'");
+		});
+
+		return $query;
+
+	}
+
 }
