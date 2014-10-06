@@ -8,9 +8,10 @@ class UserController extends \BaseController {
 	public function __construct()
 	{
 		$CUD = array('only' => ['store', 'update', 'destroy']);
+		$UD = array('only' => ['update', 'destroy']);
 
 		$this->beforeFilter('auth', $CUD);
-		$this->beforeFilter('perm_user_manage', $CUD);
+		$this->beforeFilter('perm_user_manage', $UD);
 	}
 
 	/**
@@ -53,31 +54,43 @@ class UserController extends \BaseController {
 	 */
 	public function store()
 	{
-		# Config
-		$roles = array_keys(Config::get('role_perm.roles'));
 
-		$validator = Validator::make(Input::all(), [
-			'username'  => 'required|between:3,24|unique:users,username',
-			'password'  => 'required|between:8,32',
-			'password2' => 'required|same:password',
-			'roles'     => 'required|in:' . implode(',', $roles),
-			'title'     => 'required|between:3,24',
-			'email'     => 'required|email|unique:users,email',
-			'phone'     => 'required|min:5|unique:users,phone',
-		]);
+		# Config
+		$roles   = array_keys(Config::get('role_perm.roles'));
+		$user    = User::find(Auth::id());
+		$is_perm = $user->can('users_management');
+
+		$rules = [
+		    'username'  => 'required|between:3,24|unique:users,username',
+		    'password'  => 'required|between:8,32',
+		    'password2' => 'required|same:password',
+		    'title'     => 'required|between:3,24',
+		    'email'     => 'required|email|unique:users,email',
+		    'phone'     => 'required|min:5|unique:users,phone',
+		];
+
+		if ( $is_perm ) {
+		    $rules['roles'] = 'required|in:' . implode(',', $roles);
+		}
+
+		$validator = Validator::make(Input::all(), $rules);
 
 		if ($validator->fails()) {
-			return Response::json(['success' => false]);
+		    return Response::json(['success' => false]);
 		}
 
 		$user = User::create([
-			'username'   => Input::get('username'),
-			'password'   => Input::get('password'),
-			'title'      => Input::get('title'),
-			'roles'      => Input::get('roles'),
-			'email'      => Input::get('email'),
-			'phone'      => Input::get('phone'),
+		    'username'   => Input::get('username'),
+		    'password'   => Input::get('password'),
+		    'title'      => Input::get('title'),
+		    'roles'      => ($is_perm) ? Input::get('roles') : 'normal',
+		    'email'      => Input::get('email'),
+		    'phone'      => Input::get('phone'),
 		]);
+
+		if ( !$is_perm ) {
+		    Auth::loginUsingId($user->id);
+		}
 
 		return Response::json(['success' => true]);
 	}
