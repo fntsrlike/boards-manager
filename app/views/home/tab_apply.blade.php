@@ -61,13 +61,13 @@
           <div class="form-group">
             <label for="applyFrom" class="col-sm-2 control-label">From</label>
             <div class="col-sm-10">
-              <input type="date" name="from" value="2014-09-23" class="form-control" id="applyFrom" placeholder="開始日期">
+              <input type="date" name="from" value="{{date('Y-m-d')}}" class="form-control" id="applyFrom" placeholder="開始日期">
             </div>
           </div>
           <div class="form-group">
             <label for="applyFrom" class="col-sm-2 control-label">End</label>
             <div class="col-sm-10">
-              <input type="date" name="end" value="2014-09-23" class="form-control" id="applyEnd" placeholder="結束日期">
+              <input type="date" name="end" value="{{date('Y-m-d')}}" class="form-control" id="applyEnd" placeholder="結束日期">
             </div>
           </div>
           <p class="text-danger text-center"></p>

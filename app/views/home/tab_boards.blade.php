@@ -1,4 +1,4 @@
-<div id="tab_list" class="container tab-pane">
+<div id="tab_boards" class="container tab-pane">
   <div class="row">
     <div class="col-md-12">
       <div class="container filter">

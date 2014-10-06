@@ -21,17 +21,17 @@
           <a href="#tab_map" role="tab" data-toggle="tab">Maps</a>
         </li>
         <li>
-          <a href="#tab_list" role="tab" data-toggle="tab">List</a>
+          <a href="#tab_boards" role="tab" data-toggle="tab">Boards</a>
         </li>
+        </li>
+        <li>
+          <a href="#tab_records" role="tab" data-toggle="tab">Records</a>
         </li>
         @if (Auth::check())
         <li>
           <a href="#tab_apply" role="tab" data-toggle="tab">Apply</a>
         </li>
         @endif
-        <li>
-          <a href="#tab_records" role="tab" data-toggle="tab">Records</a>
-        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         @if (Auth::check())

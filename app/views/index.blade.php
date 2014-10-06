@@ -32,9 +32,9 @@
   <div class="tab-content">
     @include('home.tab_about')
     @include('home.tab_map')
-    @include('home.tab_list')
-    @include('home.tab_apply')
+    @include('home.tab_boards')
     @include('home.tab_records')
+    @include('home.tab_apply')
   </div>
   @include('home.modal_register')
   @include('home.modal_login')
