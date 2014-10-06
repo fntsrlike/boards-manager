@@ -120,7 +120,6 @@ class ApplyRecordController extends \BaseController {
 	{
 		# Config
 		$config       = Config::get('poster');
-		$post_types   = $config['post_types'];
 		$event_types  = $config['event_types'];
 		$days         = $config['days'];
 
@@ -133,7 +132,9 @@ class ApplyRecordController extends \BaseController {
 			'end'      => 'required|date_format:Y-m-d',
 		);
 
-		if ( Validator::make($rules)->fails() ) {
+		$validator = Validator::make(Input::all(), $rules);
+
+		if ( $validator->fails() ) {
 			return Response::json(['success' => false, 'errors' => $validator->errors()]);
 		}
 
