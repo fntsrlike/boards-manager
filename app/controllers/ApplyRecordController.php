@@ -138,6 +138,11 @@ class ApplyRecordController extends \BaseController {
 			return Response::json(['success' => false, 'errors' => $validator->errors()]);
 		}
 
+		if ( Input::get('from') > Input::get('end') ) {
+			$msg = 'Begin date is later than end date.';
+			return Response::json(['success' => false, 'errors' => $msg]) ;
+		}
+
 		# Poster Status Validation
 		$board = Board::where('code', Input::get('code'))->first();
 		$from  = Input::get('from');
@@ -145,16 +150,45 @@ class ApplyRecordController extends \BaseController {
 		$days_diff = round((strtotime($end) - strtotime($from))/60/60/24);
 
 		if ( $board->getUsingStatus( $from, $end ) ) {
-			return Response::json(['success' => false]);
+			$msg = 'Board has been applied.';
+			return Response::json(['success' => false, 'errors' => $msg]) ;
 		}
 
 		# Days Validation
 		if ( $board->type == 'large' and $days_diff >  $days['large_poster'] ) {
-			return Response::json(['success' => false]);
+			$msg = "You can't applied over {$days['large_poster']} days!";
+			return Response::json(['success' => false, 'errors' => $msg]) ;
 		}
 
 		if ( $days_diff > $days[Input::get('type')] ) {
-			return Response::json(['success' => false]);
+			$msg = "You can't applied over {$days[Input::get('type')]} days!";
+			return Response::json(['success' => false, 'errors' => $msg]) ;
+		}
+
+		# Times Validation
+		$boards = Board::where('type', $board->type)->lists('id');
+		$records = ApplyRecord::date($from, $end)->where('user_id', Auth::id());
+		$amount = $records->whereIn('board_id', $boards)->count();
+		$quota = Config::get('poster.meanwhile_quota')[$board->type];
+
+		if ( $amount >= $quota ) {
+			return Response::json(['success' => false, 'messages' => 'You can\'t apply over ' . $quota .' times in same time.']);
+		}
+
+		# Continuously Validation
+		if ( $board->type != 'stairs' ) {
+			$cold_down  = Config::get('poster.cold_down');
+			$from_cd    = date('Y-m-d', strtotime($from . " - {$cold_down} days"));
+			$end_cd     = date('Y-m-d', strtotime($end  . " + {$cold_down} days"));
+			$record_cd  = ApplyRecord::where('board_id', $board->id)
+				->date($from_cd, $end_cd)
+				->where('user_id', Auth::id())
+				->count();
+
+			if ( $cold_down != 0 and 0 < $record_cd ) {
+				$msg = 'You can\'t apply same board continuously.';
+				return Response::json(['success' => false, 'errors' => $msg]) ;
+			}
 		}
 
 		# Create

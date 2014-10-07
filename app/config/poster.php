@@ -24,4 +24,13 @@ return array(
 			'union' => 'Union/Interclub',
 		],
 	],
+
+	// User can apply how many same type boards in meanwhile.
+	'meanwhile_quota' => [
+		'normal'	=> 1,
+		'stairs'	=> 1,
+		'large'		=> 1,
+	],
+
+	'cold_down' => 14, // Unit: days
 );
