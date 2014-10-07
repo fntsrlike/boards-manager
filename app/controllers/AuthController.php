@@ -18,7 +18,7 @@ class AuthController extends BaseController {
 			return Response::json(['success' => true]);
 		}
 
-		return Response::json(['success' => false]);
+		return Response::json(['success' => false, 'messages' => 'Username and password dismatch.']);
 
 	}
 

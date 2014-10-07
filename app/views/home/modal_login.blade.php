@@ -28,6 +28,10 @@
               </div>
             </div>
           </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 text-danger">
+            </div>
+          </div>
         </form>
       </div>
       <div class="modal-footer">

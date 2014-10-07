@@ -43,7 +43,10 @@
               <input type="text" name="phone" value="" class="form-control" id="registerPhone" placeholder="Format: 09xx-xxxxxx">
             </div>
           </div>
-          <p class="text-danger text-center"></p>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 text-danger">
+            </div>
+          </div>
         </form>
       </div>
       <div class="modal-footer">

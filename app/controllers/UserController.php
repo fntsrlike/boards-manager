@@ -7,10 +7,9 @@ class UserController extends \BaseController {
 	*/
 	public function __construct()
 	{
-		$CUD = array('only' => ['store', 'update', 'destroy']);
 		$UD = array('only' => ['update', 'destroy']);
 
-		$this->beforeFilter('auth', $CUD);
+		$this->beforeFilter('auth', $UD);
 		$this->beforeFilter('perm_user_manage', $UD);
 	}
 
@@ -57,8 +56,7 @@ class UserController extends \BaseController {
 
 		# Config
 		$roles   = array_keys(Config::get('role_perm.roles'));
-		$user    = User::find(Auth::id());
-		$is_perm = $user->can('users_management');
+		$is_perm = Auth::check() ? User::find(Auth::id())->can('users_management') : false;
 
 		$rules = [
 		    'username'  => 'required|between:3,24|unique:users,username',
@@ -76,7 +74,7 @@ class UserController extends \BaseController {
 		$validator = Validator::make(Input::all(), $rules);
 
 		if ($validator->fails()) {
-		    return Response::json(['success' => false]);
+		    return Response::json(['success' => false, 'messages' => $validator->errors()]);
 		}
 
 		$user = User::create([
@@ -118,7 +116,7 @@ class UserController extends \BaseController {
 		# Config
 		$roles = array_keys(Config::get('role_perm.roles'));
 
-		$validator = Validator::make(Input::all(), [
+		$rules = array(
 			'username'  => 'sometimes|between:3,24|unique:users,username',
 			'password'  => 'sometimes|between:8,32',
 			'password2' => 'sometimes|same:password',
@@ -126,10 +124,12 @@ class UserController extends \BaseController {
 			'title'     => 'sometimes|between:3,24',
 			'email'     => 'sometimes|email|unique:users,email',
 			'phone'     => 'sometimes|min:5|unique:users,phone',
-		]);
+		);
 
-		if ($validator->fails()) {
-			return Response::json(['success' => false]);
+		$validator = Validator::make(Input::all(), $rules);
+
+		if ( $validator ->fails() ) {
+			return Response::json(['success' => false, 'messages' => $validator->errors()]);
 		}
 
 		$update_info = array_diff([

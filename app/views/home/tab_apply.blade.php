@@ -70,8 +70,11 @@
               <input type="date" name="end" value="{{date('Y-m-d')}}" class="form-control" id="applyEnd" placeholder="結束日期">
             </div>
           </div>
-          <p class="text-danger text-center"></p>
-              <div class="form-group">
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 text-danger">
+            </div>
+          </div>
+          <div class="form-group">
             <div class="col-sm-12 text-center">
               <button type="submit" form= "apply_form" class="btn btn-default">Apply</button>
               <button type="reset" class="btn btn-default">Clear</button>

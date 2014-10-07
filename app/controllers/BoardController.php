@@ -75,8 +75,10 @@ class BoardController extends \BaseController {
 			'type' => 'required|in:' . implode(',', $types),
 		);
 
-		if ( Validator::make($rules)->fails() ) {
-			return Response::json(['success' => false, 'errors' => $validator->errors()]);
+		$validator = Validator::make(Input::all(), $rules);
+
+		if ( $validator ->fails() ) {
+			return Response::json(['success' => false, 'messages' => $validator->errors()]);
 		}
 
 		Board::create([

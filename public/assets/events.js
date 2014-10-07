@@ -1,11 +1,34 @@
 $( function(){
 
+    // Response render
+    events.msgRender = function( messages ) {
+        var msg;
+
+        if ( typeof(messages) == 'string' ) {
+            msg =  '<ul><li>' + messages + '</li></ul>';
+        } else if ( typeof(messages) == 'object' || typeof(messages) == 'array' ) {
+            msg = $.map( messages, function( message ) {
+                return '<li>' + message + '</li>';
+            }).join('');
+            msg = '<ul>' + msg + '</ul>';
+        }
+        else {
+            msg = 'Something error is happening.';
+        }
+        return msg;
+    }
+
     // Actions after login
     events.login = function( response ) {
+        var msg = '';
+
         if ( response.success == true ) {
             $( '#modal_login form' ).trigger( 'reset' );
             $( '#modal_login' ).modal( 'hide' );
             views.updateTarget( 'navigation' );
+        }
+        else {
+            $( '#modal_login .text-danger' ).html(events.msgRender(response.messages));
         }
     };
 
@@ -15,6 +38,9 @@ $( function(){
             $( '#modal_register form' ).trigger( 'reset' );
             $( '#modal_register' ).modal( 'hide' );
             views.updateTarget( 'navigation' );
+        }
+        else {
+            $( '#modal_register .text-danger' ).html(events.msgRender(response.messages));
         }
     };
 
@@ -29,6 +55,9 @@ $( function(){
             views.updateTarget( 'boards' );
             views.updateTarget( 'records' );
             models.readBoards( events.renderMap );
+        }
+        else {
+            $( '#tab_apply .text-danger' ).html(events.msgRender(response.messages));
         }
     };
 

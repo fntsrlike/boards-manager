@@ -135,7 +135,7 @@ class ApplyRecordController extends \BaseController {
 		$validator = Validator::make(Input::all(), $rules);
 
 		if ( $validator->fails() ) {
-			return Response::json(['success' => false, 'errors' => $validator->errors()]);
+			return Response::json(['success' => false, 'messages' => $validator->errors()]);
 		}
 
 		if ( Input::get('from') > Input::get('end') ) {
@@ -229,8 +229,10 @@ class ApplyRecordController extends \BaseController {
 			'program'  => 'required|between:3,32',
 		);
 
-		if ( Validator::make($rules)->fails() ) {
-			return Response::json(['success' => false, 'errors' => $validator->errors()]);
+		$validator = Validator::make(Input::all(), $rules);
+
+		if ( $validator ->fails() ) {
+			return Response::json(['success' => false, 'messages' => $validator->errors()]);
 		}
 
 		# Update
