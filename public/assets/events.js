@@ -109,11 +109,13 @@ $( function(){
 
     // Render popover of units of map
     events.renderMapPopover = function() {
-        var code_list, record_list, user_list;
+        var code_list, record_list, user_list, board_table, user_table, from, end, url;
 
         code_list   = '';
         record_list = '';
         user_list   = '';
+        board_table = {};
+        user_table  = {};
 
         $( '#tab_map a div.full' ).each( function() {
             var code;
@@ -128,24 +130,33 @@ $( function(){
         end  = $( '#map_date_form input[name="end_date"]' ).val(),
         url  = api.boards + '?list=' + code_list + '&from=' + from + '&end=' + end;
 
+        // Get boards, then make record list and board table
         models.get( url, function( boards ){
-
             boards.map( function( board ) {
+                board_table[board.id] = board;
                 record_list += board.using_status + ',';
             });
 
+            // Get records, then make user list
             models.get( api.records + '?list=' + record_list, function( records ){
                 records.map( function( record ) {
                     user_list += record.user_id + ',';
                 });
 
+                // Get users, then make user table
                 models.get( api.users + '?list=' + user_list, function( users ){
-                    records.map( function( record, key ) {
-                        users.map( function( user ) {
-                            if ( record.user_id == user.id ) {
-                                events.renderBoardPopover( boards[key], records[key], user );
-                            }
-                        });
+                    users.map( function( user ) {
+                        user_table[user.id] = user;
+                    });
+
+                    // Render Popover
+                    records.map( function( record ) {
+                        var board, user;
+
+                        board = board_table[record.board_id];
+                        user  = user_table[record.user_id];
+
+                        events.renderBoardPopover( board, record, user );
                     });
                 });
             });

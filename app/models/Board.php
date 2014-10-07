@@ -24,6 +24,18 @@ class Board extends Eloquent{
 			$from = $end = date("Y-m-d") ;
 		}
 
+		if ( $this->type == 'stairs' ) {
+			if ( Auth::check() ) {
+				$record = ApplyRecord::date($from, $end)
+					->where('board_id', $this->id)
+					->where('user_id', Auth::id())
+					->first();
+
+				return is_null($record) ? false : $record->id;
+			}
+			return false;
+		}
+
 		$record = ApplyRecord::date($from, $end)
 			->where('board_id', '=', $this->id)
 			->orderBy('post_from', 'desc')
