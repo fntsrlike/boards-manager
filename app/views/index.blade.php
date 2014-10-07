@@ -40,6 +40,9 @@
     @include('home.tab_boards')
     @include('home.tab_records')
     @include('home.tab_apply')
+    @if (Session::get('management', false))
+      @include('home.tab_users')
+    @endif
   </div>
   @include('home.modal_register')
   @include('home.modal_login')

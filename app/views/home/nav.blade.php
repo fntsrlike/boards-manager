@@ -23,7 +23,11 @@
         <li>
           <a href="#tab_boards" role="tab" data-toggle="tab">Boards</a>
         </li>
+        @if (Session::get('management', false))
+        <li>
+          <a href="#tab_users" role="tab" data-toggle="tab">Users</a>
         </li>
+        @endif
         <li>
           <a href="#tab_records" role="tab" data-toggle="tab">Records</a>
         </li>
@@ -35,18 +39,22 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         @if (Auth::check())
+          @if (Session::get('management', false))
+            <p class="navbar-text"><em class="text-danger">Management Mode</em></p>
+          @endif
           <li>
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{Auth::user()->username}} <span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
-              @if (Auth::user()->can('boards_management'))
-              <li>
-                <a href="#tab_management" role="tab" data-toggle="tab">Managements</a>
-              </li>
-              @endif
-              @if (Auth::user()->can('users_management'))
-                <li>
-                  <a href="#tab_administrate" role="tab" data-toggle="tab">Administrate</a>
-                </li>
+              @if (Auth::user()->ability(['manager', 'administrator'],[]))
+                @if (Session::get('management', false))
+                  <li>
+                    <a href="{{url('mode/normal')}}">Exit Management</a>
+                  </li>
+                @else
+                  <li>
+                    <a href="{{url('mode/management')}}">Management</a>
+                  </li>
+                @endif
               @endif
               <li>
                 <a href="{{action('AuthController@logout');}}" >Logout</a>

@@ -24,6 +24,30 @@ Route::get('/', function()
 
 /*
 |--------------------------------------------------------------------------
+| MODE ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::group(array('prefix' => 'mode'), function() {
+
+    Route::get('management', function()
+    {
+        if ( Auth::user()->ability(['manager', 'administrator'],[]) ){
+            Session::put('management', true);
+        }
+        return Redirect::to('/');
+    });
+
+    Route::get('normal', function()
+    {
+        Session::forget('management');
+        return Redirect::to('/');
+    });
+
+});
+
+/*
+|--------------------------------------------------------------------------
 | AUTH ROUTES
 |--------------------------------------------------------------------------
 */
@@ -31,7 +55,6 @@ Route::get('/', function()
 Route::post('login', 'AuthController@login');
 Route::get('logout', 'AuthController@logout');
 Route::get('info', 'AuthController@info');
-
 
 /*
 |--------------------------------------------------------------------------
