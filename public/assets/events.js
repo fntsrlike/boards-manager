@@ -1,5 +1,21 @@
 $( function(){
 
+    // Define hooks
+    hooks.renderRecordsTable = [];
+    hooks.renderUsersTable   = [];
+    hooks.renderMap          = [];
+    hooks.renderBoardPopover = [];
+    hooks.renderBoardsTable  = [];
+
+    // Response render
+    events.excuteHook = function( hooks ) {
+        $.map( hooks, function( hook ) {
+            if ( $.isFunction( hook ) ) {
+                hook();
+            }
+        });
+    };
+
     // Response render
     events.msgRender = function( messages ) {
         var msg;
@@ -16,7 +32,7 @@ $( function(){
             msg = 'Something error is happening.';
         }
         return msg;
-    }
+    };
 
     // Actions after login
     events.login = function( response ) {
@@ -94,7 +110,9 @@ $( function(){
         }).join();
 
         $( '#tab_records table tbody' ).html( records );
-    }
+
+        events.excuteHook( hooks.renderRecordsTable );
+    };
 
     // Create Boards Table
     events.renderBoardsTable = function( response ) {
@@ -116,7 +134,9 @@ $( function(){
         }).join();
 
         $( '#tab_boards table tbody' ).html( boards );
-    }
+
+        events.excuteHook( hooks.renderBoardsTable );
+    };
 
     // Render status of units of map.
     events.renderMap = function( response ) {
@@ -125,15 +145,14 @@ $( function(){
 
         response.map( function( board ) {
             var target;
-
-            target = $( '#map-nchu a div[data-code="' + board.code + '"' );
+            target = $( '#map-nchu a div[data-code="' + board.code + '"]' );
 
             target.toggleClass( 'full', board.using_status );
             target.toggleClass( 'empty', !board.using_status );
         });
 
         events.renderMapPopover();
-        listener.units();
+        events.excuteHook( hooks.renderMap );
     }
 
     // Render popover of units of map
@@ -190,7 +209,7 @@ $( function(){
                 });
             });
         });
-    }
+    };
 
     // Render popover of unit
     events.renderBoardPopover = function( board, record, user ) {
@@ -217,7 +236,9 @@ $( function(){
 
             target.popover( options );
         };
-    }
+
+        events.excuteHook( hooks.renderBoardPopover );
+    };
 
     // Render sorting feature of tables
     events.renderTableSort = function() {
@@ -241,7 +262,7 @@ $( function(){
             arrow = data.direction === 'asc' ? '↑' : '↓';
             th.eq( data.column ).append( '<span class="arrow">' + arrow + '</span>' );
         });
-    }
+    };
 
     // Render map with arguments
     events.updateMap = function( form ) {
@@ -252,7 +273,7 @@ $( function(){
         url = api.boards + '?from=' + from + '&end=' + end;
 
         models.get( url, events.renderMap );
-    }
+    };
 
     // Render records' table with arguments
     events.updateRecords = function( form ) {
@@ -275,7 +296,7 @@ $( function(){
 
         $( '#tab_records table tbody' ).html( '' );
         models.readRecords( events.renderRecordsTable, args );
-    }
+    };
 
     // Render boards' table with arguments
     events.updateBoards = function( form ) {
@@ -295,7 +316,7 @@ $( function(){
         $( '#tab_boards table tbody' ).html( '' );
 
         models.readBoards( events.renderBoardsTable, args );
-    }
+    };
 
     // Response events when we click unit
     events.unitClicked = function( unit ) {
@@ -320,7 +341,7 @@ $( function(){
         events.fillForm( args );
         $( 'ul.nav a[href="#tab_apply"]' ).tab( 'show' );
         window.location.hash = 'tab_apply';
-    }
+    };
 
     // Render form of application with data of clicked-unit
     events.fillForm = function( args ) {
@@ -331,6 +352,6 @@ $( function(){
         $( 'select[name="code"]', form ).val( args.code );
         $( 'input[name="from"]', form ).val( args.from );
         $( 'input[name="end"]' , form ).val( args.end );
-    }
+    };
 
 });

@@ -5,6 +5,7 @@ var config      = {};
     controllers = {},
     listener    = {},
     events      = {},
+    hooks       = {},
     api         = {},
     i18n        = {}, // i18n resource
     lang        = {}; // Target language resource decide by config

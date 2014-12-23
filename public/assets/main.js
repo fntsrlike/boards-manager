@@ -59,6 +59,8 @@ $( function(){
 
     // Initialization of JavaScript of site.
     controllers.init = function() {
+        hooks.renderMap.push( listener.units );
+
         models.readRecords( events.renderRecordsTable );
         models.readBoards( events.renderBoardsTable );
         models.readBoards( events.renderMap );
