@@ -140,7 +140,7 @@ class ApplyRecordController extends \BaseController {
 
 		if ( Input::get('from') > Input::get('end') ) {
 			$msg = 'Begin date is later than end date.';
-			return Response::json(['success' => false, 'errors' => $msg]) ;
+			return Response::json(['success' => false, 'messages' => $msg]) ;
 		}
 
 		# Poster Status Validation
@@ -151,18 +151,18 @@ class ApplyRecordController extends \BaseController {
 
 		if ( $board->getUsingStatus( $from, $end ) ) {
 			$msg = 'Board has been applied.';
-			return Response::json(['success' => false, 'errors' => $msg]) ;
+			return Response::json(['success' => false, 'messages' => $msg]) ;
 		}
 
 		# Days Validation
 		if ( $board->type == 'large' and $days_diff >  $days['large_poster'] ) {
 			$msg = "You can't applied over {$days['large_poster']} days!";
-			return Response::json(['success' => false, 'errors' => $msg]) ;
+			return Response::json(['success' => false, 'messages' => $msg]) ;
 		}
 
 		if ( $days_diff > $days[Input::get('type')] ) {
 			$msg = "You can't applied over {$days[Input::get('type')]} days!";
-			return Response::json(['success' => false, 'errors' => $msg]) ;
+			return Response::json(['success' => false, 'messages' => $msg]) ;
 		}
 
 		# Times Validation
@@ -172,7 +172,7 @@ class ApplyRecordController extends \BaseController {
 		$quota = Config::get('poster.meanwhile_quota')[$board->type];
 
 		if ( $amount >= $quota ) {
-			return Response::json(['success' => false, 'messages' => 'You can\'t apply over ' . $quota .' times in same time.']);
+			return Response::json(['success' => false, 'messages' => 'You can\'t apply more than ' . $quota .' times in same time.']);
 		}
 
 		# Continuously Validation
@@ -187,7 +187,7 @@ class ApplyRecordController extends \BaseController {
 
 			if ( $cold_down != 0 and 0 < $record_cd ) {
 				$msg = 'You can\'t apply same board continuously.';
-				return Response::json(['success' => false, 'errors' => $msg]) ;
+				return Response::json(['success' => false, 'messages' => $msg]) ;
 			}
 		}
 

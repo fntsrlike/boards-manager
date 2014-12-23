@@ -92,14 +92,14 @@ Route::filter('csrf', function()
 Route::filter('perm_boards_manage', function()
 {
 	if ( !Auth::user()->can('boards_management') ){
-		return Response::json(['success' => false, 'errors' => 'Permission Deny']);
+		return Response::json(['success' => false, 'messages' => 'Permission Deny']);
 	}
 });
 
 Route::filter('perm_user_manage', function()
 {
 	if ( !Auth::user()->can('users_management') ){
-		return Response::json(['success' => false, 'errors' => 'Permission Deny']);
+		return Response::json(['success' => false, 'messages' => 'Permission Deny']);
 	}
 });
 
@@ -107,7 +107,7 @@ Route::filter('perm_user_manage', function()
 Route::filter('perm_apply', function()
 {
 	if ( !( Auth::user()->ability([], ['apply_records_management', 'apply_post']) ) ){
-		return Response::json(['success' => false, 'errors' => 'Permission Deny']);
+		return Response::json(['success' => false, 'messages' => 'Permission Deny']);
 	}
 });
 
@@ -119,7 +119,7 @@ Route::filter('perm_apply_owner', function()
 
 	if ( !Auth::user()->can('apply_records_management') ) {
 		if ( $user_id !== Auth::id() ) {
-			return Response::json(['success' => false, 'errors' => 'Permission Deny']);
+			return Response::json(['success' => false, 'messages' => 'Permission Deny']);
 		}
 	}
 });
@@ -132,6 +132,6 @@ Route::filter('input_date', function()
 	]);
 
 	if ($validator->fails()) {
-		return Response::json(['success' => false, 'errors' => $validator->errors()]);
+		return Response::json(['success' => false, 'messages' => $validator->errors()]);
 	}
 });
