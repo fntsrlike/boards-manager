@@ -4,7 +4,16 @@
       <div class="container filter">
         <div class="col-md-12 text-left ">
           <form id="users_form" class="form" accept-charset="utf-8">
-
+            <div class="col-md-4 text-right">
+              <select name="role" class="form-control" style="height: 40px;" /
+                data-toggle="tooltip" data-placement="top" title="選擇使用者角色">
+                <option selected>All</option>
+                <option >Normal</option>
+                <option >Manager</option>
+                <option >Administrator</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
           </form>
         </div>
       </div>

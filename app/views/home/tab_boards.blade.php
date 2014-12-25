@@ -26,7 +26,7 @@
   </div>
   <div class="row">
     <div class="col-md-12">
-      <table class="table">
+      <table class="table table-hover">
         <thead>
           <tr>
             <th data-sort="string">Code</th>
