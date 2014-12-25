@@ -31,6 +31,9 @@
   <script src="./assets/views.js"></script>
   <script src="./assets/events.js"></script>
   <script src="./assets/main.js"></script>
+  @if (Session::get('management', false))
+    <script src="./assets/management_mode.js"></script>
+  @endif
 </head>
 <body>
   @include('home.nav')
