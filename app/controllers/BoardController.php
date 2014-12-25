@@ -113,6 +113,16 @@ class BoardController extends \BaseController {
 	 */
 	public function update($id)
 	{
+		$rules = array(
+			'description' => 'required',
+		);
+
+		$validator = Validator::make(Input::all(), $rules);
+
+		if ( $validator ->fails() ) {
+			return Response::json(['success' => false, 'messages' => $validator->errors()]);
+		}
+
 		$board = Board::find($id)->update([
 			'description' => Input::get('description'),
 		]);
