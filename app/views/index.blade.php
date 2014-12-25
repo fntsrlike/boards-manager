@@ -40,8 +40,15 @@
     @include('home.tab_boards')
     @include('home.tab_records')
     @include('home.tab_apply')
-    @if (Session::get('management', false))
-      @include('home.tab_users')
+    @if (Auth::check())
+      @include('home.modal_user_modify')
+      @include('home.modal_record_modify')
+      @if (Session::get('management', false))
+        @include('home.tab_users')
+        @include('home.modal_board_modify')
+        @include('home.modal_user_modify')
+        @include('home.modal_record_modify')
+      @endif
     @endif
   </div>
   @include('home.modal_register')
