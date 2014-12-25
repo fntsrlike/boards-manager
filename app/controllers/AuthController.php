@@ -25,6 +25,8 @@ class AuthController extends BaseController {
 	public function logout()
 	{
 		Auth::logout();
+		Session::forget('management');
+
 		$is_json  = Input::get('method') == 'json';
 		return $is_json ? Response::json(['success' => true]) : Redirect::to('/');
 	}
