@@ -64,7 +64,7 @@ class UserController extends \BaseController {
 		    'password2' => 'required|same:password',
 		    'title'     => 'required|between:3,24',
 		    'email'     => 'required|email|unique:users,email',
-		    'phone'     => 'required|min:5|unique:users,phone',
+		    'phone'     => 'required|size:11|unique:users,phone',
 		];
 
 		if ( $is_perm ) {
