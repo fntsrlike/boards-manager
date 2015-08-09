@@ -1,79 +1,100 @@
 <?php
+class Board extends Eloquent
+{
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'boards';
 
-class Board extends Eloquent{
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden   = [];
+    protected $fillable = ['type', 'code', 'description'];
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table = 'boards';
+    # Covert code to id
+    public static function unified2Id($list)
+    {
+        foreach ($list as $key => $value) {
+            if (!is_numeric($value)) {
+                $board = Board::where('code', $value)->first();
 
-	/**
-	 * The attributes excluded from the model's JSON form.
-	 *
-	 * @var array
-	 */
-	protected $hidden = array();
+                if ($board != null) {
+                    $list[$key] = $board->id;
+                } else {
+                    unset($list[$key]);
+                }
+            }
+        }
 
-	protected $fillable = array('type', 'code', 'description');
+        return $list;
+    }
 
-	public function getUsingStatus($from='', $end='')
-	{
-		if ( empty($from) or empty($end) ) {
-			$from = $end = date("Y-m-d") ;
-		}
+    # If board is using, return relative record id, or return false
+    public function getUsingStatus($from = '', $end = '')
+    {
+        if (empty($from) or empty($end)) {
+            $from = date("Y-m-d");
+            $end  = date("Y-m-d");
+        }
 
-		if ( $this->type == 'stairs' ) {
-			if ( Auth::check() ) {
-				$record = ApplyRecord::date($from, $end)
-					->where('board_id', $this->id)
-					->where('user_id', Auth::id())
-					->first();
+        if ($this->type == 'stairs') {
+            if (Auth::check()) {
+                $record = ApplyRecord::whereInterDateRange($from, $end)
+                            ->where('board_id', $this->id)
+                            ->where('user_id', Auth::id())
+                            ->first();
 
-				return is_null($record) ? false : $record->id;
-			}
-			return false;
-		}
+                return is_null($record) ? false : $record->id;
+            }
 
-		$record = ApplyRecord::date($from, $end)
-			->where('board_id', '=', $this->id)
-			->orderBy('post_from', 'desc')
-			->first();
+            return false;
+        }
 
-		return is_null($record) ? false : $record->id;
-	}
+        $record = ApplyRecord::whereInterDateRange($from, $end)
+                    ->where('board_id', '=', $this->id)
+                    ->max('post_from')
+                    ->first();
 
-	public function scopeCode($query, $code)
-	{
-		return $query->where('code', $code)->first();
-	}
+        return is_null($record) ? false : $record->id;
+    }
 
-	public function scopeIsUsing($query, $from='', $end='')
-	{
-		if ( empty($from) or empty($end) ) {
-			$from = $end = date("Y-m-d") ;
-		}
+    public function scopeWhereCode($query, $code)
+    {
+        return $query->where('code', $code);
+    }
 
-		$records = ApplyRecord::date($from, $end);
+    # Fetch board(s) which is being used
+    public function scopeWhereIsUsing($query, $from = '', $end = '')
+    {
+        if (empty($from) or empty($end)) {
+            $from = date("Y-m-d");
+            $end  = date("Y-m-d");
+        }
 
-		$using_boards = array_unique($records->lists('board_id'));
+        $records = ApplyRecord::whereInterDateRange($from, $end);
 
-		return $query->whereIn('id', $using_boards);
+        $using_boards = array_unique($records->lists('board_id'));
 
-	}
+        return $query->whereIn('id', $using_boards);
+    }
 
-	public function scopeIsEmpty($query, $from='', $end='')
-	{
-		if ( empty($from) or empty($end) ) {
-			$from = $end = date("Y-m-d");
-		}
+    # Fetch board(s) which is not being used
+    public function scopeWhereIsEmpty($query, $from = '', $end = '')
+    {
+        if (empty($from) or empty($end)) {
+            $from = date("Y-m-d");
+            $end  = date("Y-m-d");
+        }
 
-		$records = ApplyRecord::date($from, $end);
+        $records = ApplyRecord::whereInterDateRange($from, $end);
 
-		$using_boards = array_unique($records->lists('board_id'));
+        $using_boards = array_unique($records->lists('board_id'));
 
-		return $query->whereNotIn('id', $using_boards);
-
-	}
+        return $query->whereNotIn('id', $using_boards);
+    }
 }

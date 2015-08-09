@@ -89,14 +89,14 @@ Route::filter('csrf', function()
 	}
 });
 
-Route::filter('perm_boards_manage', function()
+Route::filter('check_boards_manage_perm', function()
 {
 	if ( !Auth::user()->can('boards_management') ){
 		return Response::json(['success' => false, 'messages' => 'Permission Deny']);
 	}
 });
 
-Route::filter('perm_user_manage', function()
+Route::filter('check_user_manage_perm', function()
 {
 	if ( !Auth::user()->can('users_management') ){
 		return Response::json(['success' => false, 'messages' => 'Permission Deny']);
@@ -104,14 +104,14 @@ Route::filter('perm_user_manage', function()
 });
 
 
-Route::filter('perm_apply', function()
+Route::filter('check_record_apply_perm', function()
 {
 	if ( !( Auth::user()->ability([], ['apply_records_management', 'apply_post']) ) ){
 		return Response::json(['success' => false, 'messages' => 'Permission Deny']);
 	}
 });
 
-Route::filter('perm_apply_owner', function()
+Route::filter('check_record_manage_perm', function()
 {
 	$record_id = Request::segment(3);
 	$record    = ApplyRecord::find($record_id);
@@ -121,17 +121,5 @@ Route::filter('perm_apply_owner', function()
 		if ( $user_id !== Auth::id() ) {
 			return Response::json(['success' => false, 'messages' => 'Permission Deny']);
 		}
-	}
-});
-
-Route::filter('input_date', function()
-{
-	$validator = Validator::make( Input::all(), [
-		'from' => 'date_format:Y-m-d',
-		'end'  => 'date_format:Y-m-d',
-	]);
-
-	if ($validator->fails()) {
-		return Response::json(['success' => false, 'messages' => $validator->errors()]);
 	}
 });

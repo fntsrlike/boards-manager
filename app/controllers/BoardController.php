@@ -13,7 +13,6 @@ class BoardController extends \BaseController {
 
 		$this->beforeFilter('auth', $CUD);
 		$this->beforeFilter('perm_boards_manage', $CUD);
-		$this->beforeFilter('input_date', $R);
 	}
 
 	/**
